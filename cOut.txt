@@ -1,0 +1,45 @@
+C:OUT - for use in jsp files only
+
+c:out is used to escape the characters &, <, >, ', " returning the corresponding character entity codes &amp; | &lt; | &gt; | &apos; | &quot; respectively.
+
+
+Rules for evaluating:
+
+	1) Is it a data object?
+	2) Is the object returning a string?
+	3) Is the string between <%=  %>
+
+Common cases:
+	
+	1) Util.getMessageString( ~ )
+	2) aHash.get( ~ )
+	3) aDo.get( ~ )
+	4) app.get( ~ )
+
+Errors cases. Do not use <c:out> here:
+	
+	1) <option> </option>
+	2) HTML.buildMessage( ~~ , dataObject , ~~ )
+	3) <Forms:buildInput ~~~ >
+	4) label.getString ( USELESS )
+
+Consequence of seemingly proper use, but web page does not agree:
+
+	1) Text may be missing
+	2) c:out may appear on the page
+	3) A 500 error may be thrown and the page will not display
+
+
+HOW TO USE:
+
+	At the top of the page add <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+	Example of use:
+
+		<c:out value="<%=Util.getMessageString(locale, labels, DeliveryLocationsReport.LABEL_EXPORT_WITH_SUPPLEMENTAL, pageObj.getScreenName())%>"/>
+		<c:out value="<%= aHash.get(DeliveryLocationsReport.PARM_PRIMARY) %>"/>
+		<c:out value="<%= sApp.getDescription() %>"/>
+	
+	Extraordinary case: Notice how a dataObject is not being passed into these parameters. If we look at the parameters of Util.getMessageString(Locale, ResourceBundle, String, Object) -> WE are passing in a string named reportType, but the parameters accept an object as the last item and therefore we are retrieving a string from an object.
+					
+		<c:out value="<%= Util.getMessageString(locale, labels, DeliveryLocationsReport.SCREEN_TITLE, reportType) %>"/>
+
